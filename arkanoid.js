@@ -6,8 +6,11 @@ let rightPressed = false, leftPressed = false;
 let ballRadius = 8;
 let x = canvas.width / 2, y = canvas.height - 30;
 let dx = 1, dy = -1; // 속도 0.5배로 감소
-let brickRowCount = 5, brickColumnCount = 7;
-let brickWidth = 55, brickHeight = 20, brickPadding = 8, brickOffsetTop = 30, brickOffsetLeft = 20;
+let brickRowCount = 5, brickColumnCount = 14; // 좌우 2배
+let brickWidth = 55, brickHeight = 20, brickPadding = 8, brickOffsetTop = 30;
+// 중앙 정렬을 위한 offsetLeft 계산
+let totalBricksWidth = brickColumnCount * brickWidth + (brickColumnCount - 1) * brickPadding;
+let brickOffsetLeft = (canvas.width - totalBricksWidth) / 2;
 let score = 0;
 let bricks = [];
 
@@ -93,7 +96,6 @@ function draw() {
     else if(y + dy > canvas.height-ballRadius-paddleHeight-2){
         if(x > paddleX && x < paddleX + paddleWidth) dy = -dy;
         else {
-            // GameOver 후 alert창에서 확인 버튼 누르면 재시작
             setTimeout(()=>{ document.location.reload(); }, 100);
             alert('GAME OVER');
         }
