@@ -1,11 +1,13 @@
 const canvas = document.getElementById('arkanoid');
 const ctx = canvas.getContext('2d');
-const paddleHeight = 10, paddleWidth = 75;
+const paddleHeight = 10, paddleWidthDefault = 75, paddleWidthMax = 150;
+let paddleWidth = paddleWidthDefault;
 let paddleX = (canvas.width - paddleWidth) / 2;
 let rightPressed = false, leftPressed = false;
 let ballRadius = 8;
 let x = canvas.width / 2, y = canvas.height - 30;
-let dx = 1, dy = -1; // 속도 0.5배로 감소
+const dxDefault = 1, dyDefault = -1;
+let dx = dxDefault, dy = dyDefault; // 속도 0.5배로 감소
 let brickRowCount = 5, brickColumnCount = 14; // 좌우 2배
 let brickWidth = 55, brickHeight = 20, brickPadding = 8, brickOffsetTop = 30;
 // 중앙 정렬을 위한 offsetLeft 계산
@@ -86,12 +88,14 @@ function drawBricks() {
     }
 }
 let animationId;
+let startTime;
 function resetGame() {
     // 게임 상태 초기화
     x = canvas.width / 2;
     y = canvas.height - 30;
-    dx = 1;
-    dy = -1;
+    dx = dxDefault;
+    dy = dyDefault;
+    paddleWidth = paddleWidthDefault;
     paddleX = (canvas.width - paddleWidth) / 2;
     rightPressed = false;
     leftPressed = false;
@@ -102,20 +106,40 @@ function resetGame() {
             bricks[c][r].status = 1;
         }
     }
+    startTime = Date.now();
     animationId = requestAnimationFrame(draw);
 }
 
 function draw() {
+    // Paddle width 증가: 60초 동안 선형적으로 2배까지
+    const elapsed = (Date.now() - startTime) / 1000;
+    paddleWidth = Math.min(paddleWidthDefault + (paddleWidthMax - paddleWidthDefault) * (elapsed / 60), paddleWidthMax);
+    paddleX = Math.max(0, Math.min(paddleX, canvas.width - paddleWidth));
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
     drawBall();
     drawPaddle();
     collisionDetection();
 
-    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) dx = -dx;
-    if(y + dy < ballRadius) dy = -dy;
+    // 공이 좌우 벽에 부딪히면 속도 증가
+    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+        dx = -dx;
+        // 속도 2배 제한
+        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 2);
+        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 2);
+    }
+    // 천장에 부딪히면 속도 증가
+    if(y + dy < ballRadius) {
+        dy = -dy;
+        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 2);
+        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 2);
+    }
     else if(y + dy > canvas.height-ballRadius-paddleHeight-2){
-        if(x > paddleX && x < paddleX + paddleWidth) dy = -dy;
+        if(x > paddleX && x < paddleX + paddleWidth) {
+            dy = -dy;
+            dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 2);
+            dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 2);
+        }
         else {
             cancelAnimationFrame(animationId);
             setTimeout(()=>{
