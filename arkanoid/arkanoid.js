@@ -136,9 +136,17 @@ function draw() {
     }
     else if(y + dy > canvas.height-ballRadius-paddleHeight-2){
         if(x > paddleX && x < paddleX + paddleWidth) {
-            dy = -dy;
-            dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 2);
-            dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 2);
+            // 패들 중앙 기준 offset (-1 ~ 1)
+            let hit = (x - (paddleX + paddleWidth / 2)) / (paddleWidth / 2);
+            // 최대 각도(라디안) 예: 60도 = Math.PI/3
+            let maxAngle = Math.PI / 3;
+            let angle = hit * maxAngle;
+            let speed = Math.sqrt(dx * dx + dy * dy);
+            dx = speed * Math.sin(angle);
+            dy = -Math.abs(speed * Math.cos(angle));
+            // 속도 증가(최대 2배)
+            dx = Math.sign(dx) * Math.min(Math.abs(dx), Math.abs(dxDefault) * 2);
+            dy = Math.sign(dy) * Math.min(Math.abs(dy), Math.abs(dyDefault) * 2);
         }
         else {
             cancelAnimationFrame(animationId);
