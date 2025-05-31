@@ -25,7 +25,7 @@ function spawnBullets() {
   const angleBase = Math.random()*Math.PI*2;
   for(let i=0; i<n; i++) {
     const angle = angleBase + (i/n)*Math.PI*2;
-    const speed = 2 + Math.random()*2;
+    const speed = 1 + Math.random()*0.8; // 속도 대폭 감소
     bullets.push({
       x: W/2, y: 120,
       r: 8,
@@ -96,7 +96,9 @@ function draw() {
 }
 
 let interval = 0;
+let running = true;
 function loop() {
+  if(!running) return;
   update();
   draw();
   interval++;
@@ -105,8 +107,24 @@ function loop() {
 }
 
 function gameOver() {
-  alert('Game Over! Your score: '+score);
-  document.location.reload();
+  running = false;
+  setTimeout(()=>{
+    if(confirm('Game Over! Your score: '+score+'\n다시 시작할까요?')) {
+      resetGame();
+    }
+  }, 100);
+}
+
+function resetGame() {
+  // 상태 초기화
+  score = 0;
+  player.x = W/2; player.y = H-60;
+  bullets = [];
+  interval = 0;
+  running = true;
+  document.getElementById('bh-score').innerText = 'Score: ' + score;
+  spawnBullets();
+  loop();
 }
 
 spawnBullets();
