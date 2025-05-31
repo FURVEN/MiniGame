@@ -44,8 +44,9 @@ function collisionDetection() {
                     score++;
                     document.getElementById('score').innerText = 'Score: ' + score;
                     if(score === brickRowCount * brickColumnCount){
-                        alert('YOU WIN!');
-                        document.location.reload();
+                        setTimeout(()=>{
+                            if(confirm('YOU WIN!\n다시 시작할까요?')) window.location.reload();
+                        }, 100);
                     }
                 }
             }
@@ -84,6 +85,26 @@ function drawBricks() {
         }
     }
 }
+let animationId;
+function resetGame() {
+    // 게임 상태 초기화
+    x = canvas.width / 2;
+    y = canvas.height - 30;
+    dx = 1;
+    dy = -1;
+    paddleX = (canvas.width - paddleWidth) / 2;
+    rightPressed = false;
+    leftPressed = false;
+    score = 0;
+    document.getElementById('score').innerText = 'Score: ' + score;
+    for(let c=0; c<brickColumnCount; c++){
+        for(let r=0; r<brickRowCount; r++){
+            bricks[c][r].status = 1;
+        }
+    }
+    animationId = requestAnimationFrame(draw);
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
@@ -96,8 +117,12 @@ function draw() {
     else if(y + dy > canvas.height-ballRadius-paddleHeight-2){
         if(x > paddleX && x < paddleX + paddleWidth) dy = -dy;
         else {
-            setTimeout(()=>{ document.location.reload(); }, 100);
-            alert('GAME OVER');
+            cancelAnimationFrame(animationId);
+            setTimeout(()=>{
+                if(confirm('GAME OVER! 다시 시작할까요?')) {
+                    resetGame();
+                }
+            }, 100);
         }
     }
 
@@ -106,6 +131,7 @@ function draw() {
 
     x += dx;
     y += dy;
-    requestAnimationFrame(draw);
+    animationId = requestAnimationFrame(draw);
 }
-draw();
+
+resetGame();
