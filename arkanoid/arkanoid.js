@@ -46,8 +46,11 @@ function collisionDetection() {
                     score++;
                     document.getElementById('score').innerText = 'Score: ' + score;
                     if(score === brickRowCount * brickColumnCount){
+                        cancelAnimationFrame(animationId);
                         setTimeout(()=>{
-                            if(confirm('YOU WIN!\\n다시 시작할까요?')) window.location.reload();
+                            if(confirm('YOU WIN!\n다시 시작할까요?')) {
+                                resetGame();
+                            }
                         }, 100);
                     }
                 }
