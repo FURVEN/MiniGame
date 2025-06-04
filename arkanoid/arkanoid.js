@@ -6,8 +6,8 @@ let paddleX = (canvas.width - paddleWidth) / 2;
 let rightPressed = false, leftPressed = false;
 let ballRadius = 8;
 let x = canvas.width / 2, y = canvas.height - 30;
-const dxDefault = 1, dyDefault = -1;
-let dx = dxDefault, dy = dyDefault; // 속도 0.5배로 감소
+const dxDefault = 2, dyDefault = -2; // 속도를 2배로 증가
+let dx = dxDefault, dy = dyDefault;
 let brickRowCount = 5, brickColumnCount = 14; // 좌우 2배
 let brickWidth = 55, brickHeight = 20, brickPadding = 8, brickOffsetTop = 30;
 // 중앙 정렬을 위한 offsetLeft 계산
@@ -47,7 +47,7 @@ function collisionDetection() {
                     document.getElementById('score').innerText = 'Score: ' + score;
                     if(score === brickRowCount * brickColumnCount){
                         setTimeout(()=>{
-                            if(confirm('YOU WIN!\n다시 시작할까요?')) window.location.reload();
+                            if(confirm('YOU WIN!\\n다시 시작할까요?')) window.location.reload();
                         }, 100);
                     }
                 }
@@ -121,18 +121,18 @@ function draw() {
     drawPaddle();
     collisionDetection();
 
-    // 공이 좌우 벽에 부딪히면 속도 증가
+    // 공이 좌우 벽에 부딪히면 속도 증가 (개선된 속도 증가율과 최대 속도)
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
         dx = -dx;
-        // 속도 2배 제한
-        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 2);
-        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 2);
+        // 속도 4배 제한으로 증가, 증가율도 1.08로 조정
+        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.08, Math.abs(dxDefault) * 4);
+        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.08, Math.abs(dyDefault) * 4);
     }
     // 천장에 부딪히면 속도 증가
     if(y + dy < ballRadius) {
         dy = -dy;
-        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 2);
-        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 2);
+        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.08, Math.abs(dxDefault) * 4);
+        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.08, Math.abs(dyDefault) * 4);
     }
     else if(y + dy > canvas.height-ballRadius-paddleHeight-2){
         if(x > paddleX && x < paddleX + paddleWidth) {
@@ -144,9 +144,9 @@ function draw() {
             let speed = Math.sqrt(dx * dx + dy * dy);
             dx = speed * Math.sin(angle);
             dy = -Math.abs(speed * Math.cos(angle));
-            // 속도 증가(최대 2배)
-            dx = Math.sign(dx) * Math.min(Math.abs(dx), Math.abs(dxDefault) * 2);
-            dy = Math.sign(dy) * Math.min(Math.abs(dy), Math.abs(dyDefault) * 2);
+            // 속도 증가(최대 4배로 조정)
+            dx = Math.sign(dx) * Math.min(Math.abs(dx), Math.abs(dxDefault) * 4);
+            dy = Math.sign(dy) * Math.min(Math.abs(dy), Math.abs(dyDefault) * 4);
         }
         else {
             cancelAnimationFrame(animationId);
