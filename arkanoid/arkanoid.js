@@ -6,7 +6,7 @@ let paddleX = (canvas.width - paddleWidth) / 2;
 let rightPressed = false, leftPressed = false;
 let ballRadius = 8;
 let x = canvas.width / 2, y = canvas.height - 30;
-const dxDefault = 2, dyDefault = -2; // 속도를 2배로 증가
+const dxDefault = 8, dyDefault = -8; // 속도를 4배로 증가 (2 -> 8)
 let dx = dxDefault, dy = dyDefault;
 let brickRowCount = 5, brickColumnCount = 14; // 좌우 2배
 let brickWidth = 55, brickHeight = 20, brickPadding = 8, brickOffsetTop = 30;
@@ -125,14 +125,14 @@ function draw() {
     if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
         dx = -dx;
         // 속도 4배 제한으로 증가, 증가율도 1.08로 조정
-        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.08, Math.abs(dxDefault) * 4);
-        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.08, Math.abs(dyDefault) * 4);
+        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 4);
+        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 4);
     }
     // 천장에 부딪히면 속도 증가
     if(y + dy < ballRadius) {
         dy = -dy;
-        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.08, Math.abs(dxDefault) * 4);
-        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.08, Math.abs(dyDefault) * 4);
+        dx = Math.sign(dx) * Math.min(Math.abs(dx) * 1.05, Math.abs(dxDefault) * 4);
+        dy = Math.sign(dy) * Math.min(Math.abs(dy) * 1.05, Math.abs(dyDefault) * 4);
     }
     else if(y + dy > canvas.height-ballRadius-paddleHeight-2){
         if(x > paddleX && x < paddleX + paddleWidth) {
@@ -158,8 +158,8 @@ function draw() {
         }
     }
 
-    if(rightPressed && paddleX < canvas.width-paddleWidth) paddleX += 6;
-    else if(leftPressed && paddleX > 0) paddleX -= 6;
+    if(rightPressed && paddleX < canvas.width-paddleWidth) paddleX += 8; // 패들 속도도 약간 증가
+    else if(leftPressed && paddleX > 0) paddleX -= 8;
 
     x += dx;
     y += dy;
