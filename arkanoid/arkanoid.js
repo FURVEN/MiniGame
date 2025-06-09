@@ -47,7 +47,7 @@ function collisionDetection() {
                     document.getElementById('score').innerText = 'Score: ' + score;
                     if(score === brickRowCount * brickColumnCount){
                         setTimeout(()=>{
-                            if(confirm('YOU WIN!\\n다시 시작할까요?')) window.location.reload();
+                            if(confirm('YOU WIN!\n다시 시작할까요?')) window.location.reload();
                         }, 100);
                     }
                 }
@@ -89,6 +89,7 @@ function drawBricks() {
 }
 let animationId;
 let startTime;
+let isGameOver = false;
 function resetGame() {
     // 게임 상태 초기화
     x = canvas.width / 2;
@@ -107,10 +108,12 @@ function resetGame() {
         }
     }
     startTime = Date.now();
+    isGameOver = false;
     animationId = requestAnimationFrame(draw);
 }
 
 function draw() {
+    if(isGameOver) return;
     // Paddle width 증가: 60초 동안 선형적으로 2배까지
     const elapsed = (Date.now() - startTime) / 1000;
     paddleWidth = Math.min(paddleWidthDefault + (paddleWidthMax - paddleWidthDefault) * (elapsed / 60), paddleWidthMax);
@@ -150,10 +153,12 @@ function draw() {
         }
         else {
             cancelAnimationFrame(animationId);
+            isGameOver = true;
             setTimeout(()=>{
                 if(confirm('GAME OVER! 다시 시작할까요?')) {
                     resetGame();
                 }
+                // '취소'를 누르면 아무 동작 없이 멈춘 상태로 유지
             }, 100);
         }
     }
